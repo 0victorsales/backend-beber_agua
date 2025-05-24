@@ -1,11 +1,14 @@
 from pydantic import BaseModel
-from datetime import date, time
+
+class ConsumoDiarioCreateSchema(BaseModel):
+    nome_usuario: str
+    consumo_ml: float
 
 class ConsumoDiarioSchema(BaseModel):
     nome_usuario: str
-    data: date
-    horario: time
-    consumo_ml: int
+    data: str
+    horario: str
+    consumo_ml: float
 
     class Config:
-        orm_mode = True
+        from_attributes = True

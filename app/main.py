@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.rotas import rotas
 from app.database import Base, engine
 
-app = FastAPI(title="beber_aguae")
+app = FastAPI(title="beber_agua")
 
  
 app.add_middleware(
@@ -23,3 +23,4 @@ app.include_router(rotas.router)
 @app.get("/ping")
 def ping():
     return {"mensagem": "pong"}
+
