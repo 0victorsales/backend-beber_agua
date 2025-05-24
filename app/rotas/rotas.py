@@ -167,3 +167,45 @@ def listar_consumos_hoje(nome_usuario: str = Query(..., description="Nome do usu
             status_code=500,
             content={"erro": f"Ocorreu um erro inesperado: {str(e)}"}
         )
+
+
+
+@router.get("/progresso-hoje")
+def progresso_hoje(
+    nome_usuario: str = Query(..., description="Nome do usuário"),
+    db: Session = Depends(get_db)
+):
+    try:
+        data_hoje = datetime.now().date()
+
+        consumo_total_ml = db.query(func.sum(ConsumoDiario.consumo_ml)).filter(
+            ConsumoDiario.nome_usuario == nome_usuario,
+            ConsumoDiario.data == data_hoje
+        ).scalar() or 0
+
+        meta = db.query(MetaUsuario).filter(MetaUsuario.nome_usuario == nome_usuario).first()
+        meta_litros = meta.meta_litros if meta else 0
+
+        consumo_total_litros = consumo_total_ml / 1000
+        litros_faltantes = max(meta_litros - consumo_total_litros, 0)
+
+        percentual_atingido = (consumo_total_litros / meta_litros) * 100 if meta_litros > 0 else 0
+
+        return JSONResponse(
+            status_code=200,
+            content={
+                "mensagem": f"Progresso de {nome_usuario} em {data_hoje}:",
+                "dados": {
+                    "consumo_total_hoje_ml": consumo_total_ml,
+                    "meta_litros": meta_litros,
+                    "litros_faltantes": litros_faltantes,
+                    "percentual_atingido": percentual_atingido
+                }
+            }
+        )
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"erro": f"Ocorreu um erro inesperado: {str(e)}"}
+        )
