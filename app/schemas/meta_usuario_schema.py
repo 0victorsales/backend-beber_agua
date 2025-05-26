@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 class MetaUsuarioCreateSchema(BaseModel):
     nome_usuario: str
-    meta_litros: float  
+    peso_kg: float   
 
 class MetaUsuarioSchema(BaseModel):
     id: int

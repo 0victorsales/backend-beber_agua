@@ -76,15 +76,18 @@ def criar_consumo(consumo: ConsumoDiarioCreateSchema, db: Session = Depends(get_
             content={"erro": f"Ocorreu um erro inesperado: {str(e)}"}
         )
 
-@router.post("/registrar-meta", response_model=MetaUsuarioSchema)
+@router.post("/meta", response_model=MetaUsuarioSchema)
 def registrar_meta(meta: MetaUsuarioCreateSchema, db: Session = Depends(get_db)):
     try:
+        peso_kg = meta.peso_kg
+        meta_litros = (peso_kg * 35) / 1000  
+
         meta_existente = db.query(MetaUsuario).filter(
             MetaUsuario.nome_usuario == meta.nome_usuario
         ).first()
 
         if meta_existente:
-            meta_existente.meta_litros = meta.meta_litros
+            meta_existente.meta_litros = meta_litros
             db.commit()
             db.refresh(meta_existente)
 
@@ -102,7 +105,7 @@ def registrar_meta(meta: MetaUsuarioCreateSchema, db: Session = Depends(get_db))
         else:
             nova_meta = MetaUsuario(
                 nome_usuario=meta.nome_usuario,
-                meta_litros=meta.meta_litros
+                meta_litros=meta_litros
             )
             db.add(nova_meta)
             db.commit()
@@ -132,6 +135,7 @@ def registrar_meta(meta: MetaUsuarioCreateSchema, db: Session = Depends(get_db))
             status_code=500,
             content={"erro": f"Ocorreu um erro inesperado: {str(e)}"}
         )
+
 
 
 
